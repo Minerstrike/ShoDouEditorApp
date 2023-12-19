@@ -3,6 +3,9 @@ using Microsoft.Win32;
 using ShoDouEditor.Windows.Base;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace ShoDouEditor.Windows;
 
@@ -18,13 +21,12 @@ public partial class TextEditorWindow : BaseWindow
     public string fileName
     {
         get => _fileName;
-        set 
-        { 
+        set
+        {
             _fileName = value;
             NotifyPropertyChanged();
         }
     }
-
 
     #endregion
 
@@ -44,6 +46,34 @@ public partial class TextEditorWindow : BaseWindow
         }
     }
 
+    private bool _isShowingSearchPopup;
+    /// <summary>
+    /// Determines whether the searhc popup is showing
+    /// </summary>
+    public bool isShowingSearchPopup
+    {
+        get => _isShowingSearchPopup;
+        set 
+        { 
+            _isShowingSearchPopup = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    private string _searchString = string.Empty;
+    /// <summary>
+    /// The property responsible for dealing with the search popups text
+    /// </summary>
+    public string searchString
+    {
+        get => _searchString;
+        set
+        {
+            _searchString = value;
+            NotifyPropertyChanged();
+        }
+    }
+
     #endregion
 
     #region Constructor
@@ -54,13 +84,16 @@ public partial class TextEditorWindow : BaseWindow
     public TextEditorWindow()
     {
         InitializeComponent();
+
+        ThemeManager.Current.ThemeSyncMode = ThemeSyncMode.SyncWithAppMode;
+        ThemeManager.Current.SyncTheme();
     }
 
     #endregion
 
     #region Menu Events
 
-        #region File Section
+    #region File Section
 
     private void MenuItem_Open_Click(object sender, RoutedEventArgs e)
     {
@@ -109,7 +142,7 @@ public partial class TextEditorWindow : BaseWindow
 
     #endregion
 
-        #region Edit Section
+    #region Edit Section
 
     private void MenuItem_Undo_Click(object sender, RoutedEventArgs e)
     {
@@ -138,7 +171,11 @@ public partial class TextEditorWindow : BaseWindow
 
     private void MenuItem_Find_Click(object sender, RoutedEventArgs e)
     {
-        NotImplementedMessageBox();
+        InDevelopmentMessageBox();
+
+        isShowingSearchPopup = true;
+
+        closeButton_Refresh();
     }
 
     private void MenuItem_FindNext_Click(object sender, RoutedEventArgs e)
@@ -173,16 +210,18 @@ public partial class TextEditorWindow : BaseWindow
 
     #endregion
 
-        #region View Section
+    #region View Section
 
     private void MenuItem_LightTheme_Click(object sender, RoutedEventArgs e)
     {
-        ThemeManager.Current.ChangeTheme(this, "Light.Steel");
+        ThemeManager.Current.ChangeTheme(Application.Current, "Light.Steel");
+        ThemeManager.Current.ChangeTheme(searchPopup, "Light.Steel");
     }
 
     private void MenuItem_DarkTheme_Click(object sender, RoutedEventArgs e)
     {
-        ThemeManager.Current.ChangeTheme(this, "Dark.Mauve");
+        ThemeManager.Current.ChangeTheme(Application.Current, "Dark.Mauve");
+        ThemeManager.Current.ChangeTheme(searchPopup, "Dark.Mauve");
     }
 
     #endregion
@@ -204,6 +243,11 @@ public partial class TextEditorWindow : BaseWindow
         MessageBox.Show("This feature is under development. This is unstable and may cause unforseen problems.", "Under development", MessageBoxButton.OK, MessageBoxImage.Warning);
     }
 
+    private void closeButton_Refresh()
+    {
+        closeButton.Foreground = Brushes.Black;
+    }
+
     #endregion
 
     #region Window Events
@@ -215,5 +259,23 @@ public partial class TextEditorWindow : BaseWindow
         TbMain.Focus();
     }
 
+    protected override void OnClosed(EventArgs e)
+    {
+        base.OnClosed(e);
+
+        Application.Current.Shutdown();
+    }
+
     #endregion
+
+    #region Button Events
+
+    private void closeButton_Click(object sender, RoutedEventArgs e)
+    {
+        isShowingSearchPopup = false;
+        ((Button)sender).Foreground = Brushes.Red;
+    }
+
+    #endregion
+
 }

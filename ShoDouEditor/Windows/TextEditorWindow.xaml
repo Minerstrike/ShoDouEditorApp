@@ -7,6 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:ShoDouEditor.Windows"
     mc:Ignorable="d"
+    x:Name="thisWindow"
     Title="ShoDou"
     Height="450"
     Width="800"
@@ -16,6 +17,8 @@
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition
+                Height="Auto" />
             <RowDefinition
                 Height="Auto" />
             <RowDefinition
@@ -98,7 +101,7 @@
                     Click="MenuItem_Font_Click" />
             </MenuItem>
             <!--#endregion-->
-            
+
             <!-- View Menu Section -->
             <!--#region View -->
             <!--#region Theme -->
@@ -106,9 +109,9 @@
                 Header="View">
                 <MenuItem
                     Header="Themes">
-                    <MenuItem 
+                    <MenuItem
                         Header="Light"
-                        Click="MenuItem_LightTheme_Click"/>
+                        Click="MenuItem_LightTheme_Click" />
                     <MenuItem
                         Header="Dark"
                         Click="MenuItem_DarkTheme_Click" />
@@ -119,14 +122,57 @@
             <!--#endregion-->
         </Menu>
 
+        <Border
+            Grid.Row="1"
+            Padding="0"
+            Margin="0"
+            HorizontalAlignment="Right"
+            Width="10"
+            BorderThickness="0">
+            <Popup
+                x:Name="searchPopup"
+                Placement="Left"
+                IsOpen="{Binding isShowingSearchPopup}">
+                <Grid
+                    Width="200"
+                    Background="#EEEEEE">
+                    <Grid.RowDefinitions>
+                        <RowDefinition
+                            Height="*" />
+                    </Grid.RowDefinitions>
+                    
+                    <Button
+                        x:Name="closeButton"
+                        Panel.ZIndex="-1"
+                        Style="{DynamicResource MahApps.Styles.Button.Chromeless}"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Content="&#10006;"
+                        FontWeight="ExtraLight"
+                        FontSize="16"
+                        Click="closeButton_Click"/>
+                    
+                    <StackPanel
+                        Grid.Row="1">
+                        <TextBlock
+                            Text="Find:"
+                            Margin="10" />
+                        <TextBox
+                            Margin="10,0,10,10"
+                            Text="{Binding searchString, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                </Grid>
+            </Popup>
+        </Border>
+
         <TextBox
             x:Name="TbMain"
-            Grid.Row="1"
+            Grid.Row="2"
             Margin="20"
             BorderThickness="0"
             FontSize="24"
             Text="{Binding textEditorText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             AcceptsTab="True"
-            AcceptsReturn="True"/>
+            AcceptsReturn="True" />
     </Grid>
 </base:BaseWindow>
