@@ -1,0 +1,9 @@
+This is a text document holding text.
+
+This text document is being used as a test.
+
+Thus TextTest.
+
+This seems to be working well, this demo will even remove text from shodou.
+
+Works beautifully!
