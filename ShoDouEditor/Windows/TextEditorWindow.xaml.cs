@@ -2,8 +2,10 @@
 using Microsoft.Win32;
 using ShoDouEditor.Windows.Base;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -18,6 +20,9 @@ public partial class TextEditorWindow : BaseWindow
     #region Properties
 
     private string _fileName = string.Empty;
+    /// <summary>
+    /// The property holding the fileName
+    /// </summary>
     public string fileName
     {
         get => _fileName;
@@ -26,6 +31,24 @@ public partial class TextEditorWindow : BaseWindow
             _fileName = value;
             NotifyPropertyChanged();
         }
+    }
+
+    #endregion
+
+    #region Constructor
+
+    /// <summary>
+    /// Constructor for TextEditorWindow
+    /// </summary>
+    public TextEditorWindow()
+    {
+        InitializeComponent();
+
+        ThemeManager.Current.ThemeSyncMode = ThemeSyncMode.SyncWithAppMode;
+        ThemeManager.Current.SyncTheme();
+
+        SizeChanged     += delegate { ResetPopupLocation(); };
+        LocationChanged += delegate { ResetPopupLocation(); };
     }
 
     #endregion
@@ -44,50 +67,7 @@ public partial class TextEditorWindow : BaseWindow
             _textEditorText = value;
             NotifyPropertyChanged();
         }
-    }
-
-    private bool _isShowingSearchPopup;
-    /// <summary>
-    /// Determines whether the searhc popup is showing
-    /// </summary>
-    public bool isShowingSearchPopup
-    {
-        get => _isShowingSearchPopup;
-        set 
-        { 
-            _isShowingSearchPopup = value;
-            NotifyPropertyChanged();
-        }
-    }
-
-    private string _searchString = string.Empty;
-    /// <summary>
-    /// The property responsible for dealing with the search popups text
-    /// </summary>
-    public string searchString
-    {
-        get => _searchString;
-        set
-        {
-            _searchString = value;
-            NotifyPropertyChanged();
-        }
-    }
-
-    #endregion
-
-    #region Constructor
-
-    /// <summary>
-    /// Constructor for TextEditorWindow
-    /// </summary>
-    public TextEditorWindow()
-    {
-        InitializeComponent();
-
-        ThemeManager.Current.ThemeSyncMode = ThemeSyncMode.SyncWithAppMode;
-        ThemeManager.Current.SyncTheme();
-    }
+    } 
 
     #endregion
 
@@ -97,42 +77,17 @@ public partial class TextEditorWindow : BaseWindow
 
     private void MenuItem_Open_Click(object sender, RoutedEventArgs e)
     {
-        OpenFileDialog openFileDialog = new OpenFileDialog();
-        openFileDialog.Filter = "Text Files Only | *.txt";
-
-        if (openFileDialog.ShowDialog().HasValue)
-        {
-            fileName = openFileDialog.FileName;
-        }
-
-        if (string.IsNullOrWhiteSpace(fileName) == false)
-        {
-            textEditorText = File.ReadAllText(fileName);
-        }
+        OpenFile();
     }
 
     private void MenuItem_Save_Click(object sender, System.Windows.RoutedEventArgs e)
     {
-        if (string.IsNullOrWhiteSpace(fileName) == false)
-        {
-            File.WriteAllText(fileName, textEditorText);
-        }
+        SaveToFile();
     }
 
     private void MenuItem_SaveAs_Click(object sender, RoutedEventArgs e)
     {
-        SaveFileDialog saveFileDialog = new SaveFileDialog();
-        saveFileDialog.Filter = "Text Files Only | *.txt";
-
-        if (saveFileDialog.ShowDialog().HasValue)
-        {
-            fileName = saveFileDialog.FileName;
-        }
-
-        if (string.IsNullOrWhiteSpace(fileName) == false)
-        {
-            File.WriteAllText(fileName, textEditorText);
-        }
+        SaveAsFile();
     }
 
     private void MenuItem_Exit_Click(object sender, System.Windows.RoutedEventArgs e)
@@ -171,21 +126,21 @@ public partial class TextEditorWindow : BaseWindow
 
     private void MenuItem_Find_Click(object sender, RoutedEventArgs e)
     {
-        InDevelopmentMessageBox();
-
-        isShowingSearchPopup = true;
-
-        closeButton_Refresh();
+        ShowSearchPopup();
     }
 
     private void MenuItem_FindNext_Click(object sender, RoutedEventArgs e)
     {
-        NotImplementedMessageBox();
+        InDevelopmentMessageBox();
+
+        ShowSearchPopup();
     }
 
     private void MenuItem_FindPrevious_Click(object sender, RoutedEventArgs e)
     {
-        NotImplementedMessageBox();
+        InDevelopmentMessageBox();
+
+        ShowSearchPopup();
     }
 
     private void MenuItem_Replace_Click(object sender, RoutedEventArgs e)
@@ -231,21 +186,79 @@ public partial class TextEditorWindow : BaseWindow
     #region Methods
 
     /// <summary>
-    /// A method that display a message saying that the requested feature is not implemented
+    /// A method that displays a message saying that the requested feature is not implemented
     /// </summary>
     public void NotImplementedMessageBox()
     {
         MessageBox.Show(new NotImplementedException().Message, "Not implemented", MessageBoxButton.OK, MessageBoxImage.Error);
     }
 
+    /// <summary>
+    /// A method that displays a message saying that the requested feature is in development
+    /// </summary>
     public void InDevelopmentMessageBox()
     {
         MessageBox.Show("This feature is under development. This is unstable and may cause unforseen problems.", "Under development", MessageBoxButton.OK, MessageBoxImage.Warning);
     }
 
-    private void closeButton_Refresh()
+    #region File
+
+    public void OpenFile()
     {
-        closeButton.Foreground = Brushes.Black;
+        OpenFileDialog openFileDialog = new OpenFileDialog();
+        openFileDialog.Filter = "Text Files Only | *.txt";
+
+        if (openFileDialog.ShowDialog().HasValue)
+        {
+            fileName = openFileDialog.FileName;
+        }
+
+        if (string.IsNullOrWhiteSpace(fileName) == false)
+        {
+            textEditorText = File.ReadAllText(fileName);
+        }
+    }
+
+    public void SaveToFile()
+    {
+        if (string.IsNullOrWhiteSpace(fileName) == false)
+        {
+            File.WriteAllText(fileName, textEditorText);
+        }
+    }
+
+    public void SaveAsFile()
+    {
+        SaveFileDialog saveFileDialog = new SaveFileDialog();
+        saveFileDialog.Filter = "Text Files Only | *.txt";
+
+        if (saveFileDialog.ShowDialog().HasValue)
+        {
+            fileName = saveFileDialog.FileName;
+        }
+
+        if (string.IsNullOrWhiteSpace(fileName) == false)
+        {
+            File.WriteAllText(fileName, textEditorText);
+        }
+    }
+
+    #endregion
+
+    #region Edit
+
+    public void ShowSearchPopup()
+    {
+        InDevelopmentMessageBox();
+
+        searchPopup.isShowingSearchPopup = true;
+    } 
+
+    #endregion
+
+    public void ResetPopupLocation()
+    {
+        
     }
 
     #endregion
@@ -268,14 +281,18 @@ public partial class TextEditorWindow : BaseWindow
 
     #endregion
 
-    #region Button Events
-
-    private void closeButton_Click(object sender, RoutedEventArgs e)
+    #region Control Events
+    
+    private void SearchPopup_KeyDown(object sender, KeyEventArgs e)
     {
-        isShowingSearchPopup = false;
-        ((Button)sender).Foreground = Brushes.Red;
+        if (e.Key == Key.Enter)
+        {
+            searchPopup.targetText = textEditorText;
+
+            TbMain.Select(searchPopup.start, searchPopup.searchString.Length);
+            TbMain.Focus();
+        }
     }
 
     #endregion
-
 }

@@ -7,33 +7,7 @@
     xmlns:local="clr-namespace:ShoDouEditor.Windows.User_Controls"
     mc:Ignorable="d">
 
-    <Grid
-        Background="#EEEEEE"
-        Width="200">
-        <Grid.RowDefinitions>
-            <RowDefinition
-                Height="Auto" />
-            <RowDefinition
-                Height="*" />
-        </Grid.RowDefinitions>
-
-        <Button
-            x:Name="closeButton"
-            Panel.ZIndex="-1"
-            Style="{StaticResource MahApps.Styles.Button.Chromeless}"
-            HorizontalAlignment="Right"
-            VerticalAlignment="Top"
-            Content="&#10006;"
-            FontWeight="ExtraLight"
-            FontSize="16"/>
-
-        <StackPanel
-            Grid.Row="1">
-            <TextBlock
-                Text="Find:"
-                Margin="10" />
-            <TextBox
-                Margin="10,0,10,10" />
-        </StackPanel>
+    <Grid>
+        
     </Grid>
 </UserControl>
