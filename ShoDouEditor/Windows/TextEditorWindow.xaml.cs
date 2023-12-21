@@ -47,8 +47,9 @@ public partial class TextEditorWindow : BaseWindow
         ThemeManager.Current.ThemeSyncMode = ThemeSyncMode.SyncWithAppMode;
         ThemeManager.Current.SyncTheme();
 
-        SizeChanged     += delegate { ResetPopupLocation(); };
-        LocationChanged += delegate { ResetPopupLocation(); };
+        searchPopup.SearchPopupEnterKeyDown += SearchPopup_EnterKeyDown;
+        searchPopup.NextButtonDown          += InDevelopmentMessageBox;
+        searchPopup.PreviousButtonDown      += InDevelopmentMessageBox;
     }
 
     #endregion
@@ -132,15 +133,11 @@ public partial class TextEditorWindow : BaseWindow
     private void MenuItem_FindNext_Click(object sender, RoutedEventArgs e)
     {
         InDevelopmentMessageBox();
-
-        ShowSearchPopup();
     }
 
     private void MenuItem_FindPrevious_Click(object sender, RoutedEventArgs e)
     {
         InDevelopmentMessageBox();
-
-        ShowSearchPopup();
     }
 
     private void MenuItem_Replace_Click(object sender, RoutedEventArgs e)
@@ -249,16 +246,49 @@ public partial class TextEditorWindow : BaseWindow
 
     public void ShowSearchPopup()
     {
-        InDevelopmentMessageBox();
-
         searchPopup.isShowingSearchPopup = true;
     } 
 
     #endregion
 
-    public void ResetPopupLocation()
+    private void NextMatch()
     {
-        
+        if (searchPopup.matches is not null)
+        {
+            if ((searchPopup.matches.Count > 0) && (searchPopup.currentMatch <= searchPopup.matches.Count))
+            {
+                searchPopup.currentMatch++;
+                SearchPopup_EnterKeyDown();
+            }
+            else
+            {
+                MessageBox.Show("Item not found", "Not found", MessageBoxButton.OK, MessageBoxImage.Information);
+            } 
+        }
+        else 
+        {
+            SearchPopup_EnterKeyDown();
+        }
+    }
+
+    private void PreviousMatch()
+    {
+        if (searchPopup.matches is not null)
+        {
+            if ((searchPopup.matches.Count > 0) && (searchPopup.currentMatch > 0))
+            {
+                searchPopup.currentMatch--;
+                SearchPopup_EnterKeyDown();
+            }
+            else
+            {
+                MessageBox.Show("Item not found", "Not found", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+        else
+        {
+            SearchPopup_EnterKeyDown();
+        }
     }
 
     #endregion
@@ -279,18 +309,60 @@ public partial class TextEditorWindow : BaseWindow
         Application.Current.Shutdown();
     }
 
+    private void thisWindow_KeyDown(object sender, KeyEventArgs e)
+    {
+        TbMain.IsEnabled = false;
+
+        #region File
+
+        if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.O)
+        {
+            OpenFile();
+        }
+
+        if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.S)
+        {
+            SaveToFile();
+        }
+
+        if (Keyboard.Modifiers == ModifierKeys.Control && Keyboard.Modifiers == ModifierKeys.Shift && e.Key == Key.S)
+        {
+            SaveAsFile();
+        }
+
+        #endregion
+
+        #region Edit
+
+        if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.F)
+        {
+            ShowSearchPopup();
+        }
+
+        TbMain.IsEnabled = true; 
+
+        #endregion
+    }
+
     #endregion
 
     #region Control Events
-    
-    private void SearchPopup_KeyDown(object sender, KeyEventArgs e)
-    {
-        if (e.Key == Key.Enter)
-        {
-            searchPopup.targetText = textEditorText;
 
-            TbMain.Select(searchPopup.start, searchPopup.searchString.Length);
+    private void SearchPopup_EnterKeyDown()
+    {
+        searchPopup.searchRegex = new Regex("(?i)" + searchPopup.searchString);
+        searchPopup.matches = searchPopup.searchRegex.Matches(textEditorText);
+
+        if (searchPopup.matches.Count > 0)
+        {
+            searchPopup.start = searchPopup.matches[searchPopup.currentMatch].Index;
+
+            TbMain.Select(searchPopup.start,searchPopup.searchString.Length);
             TbMain.Focus();
+        }
+        else
+        {
+            MessageBox.Show("Item not found", "Not found", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 

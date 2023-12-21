@@ -13,15 +13,16 @@
     Height="450"
     Width="800"
     FontSize="24"
-    DataContext="{Binding RelativeSource={RelativeSource Self}}">
+    DataContext="{Binding RelativeSource={RelativeSource Self}}"
+    KeyDown="thisWindow_KeyDown">
 
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition
                 Height="Auto" />
-            <RowDefinition
-                Height="Auto" />
+            <!--<RowDefinition
+                Height="Auto" />-->
             <RowDefinition
                 Height="*" />
         </Grid.RowDefinitions>
@@ -123,19 +124,22 @@
             <!--#endregion-->
         </Menu>
 
-        <Border
-            x:Name="popupHolder"
-            Grid.Row="1"
-            Padding="0"
-            Margin="0"
-            HorizontalAlignment="Right"
-            BorderThickness="0">
-            <user_controls:SearchPopup
-                x:Name="searchPopup"
-                KeyDown="SearchPopup_KeyDown" />
-        </Border>
+        <StackPanel
+            Grid.Row="2">
+            <Border
+                x:Name="popupHolder"
+                Padding="0"
+                Margin="0"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                BorderThickness="0">
+                <user_controls:SearchPopup
+                    x:Name="searchPopup" />
+            </Border>
+        </StackPanel>
 
         <TextBox
+            Panel.ZIndex="-1"
             x:Name="TbMain"
             Grid.Row="2"
             Margin="20"

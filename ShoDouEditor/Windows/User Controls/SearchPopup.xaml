@@ -7,7 +7,8 @@
     xmlns:local="clr-namespace:ShoDouEditor.Windows.User_Controls"
     xmlns:base="clr-namespace:ShoDouEditor.Windows.User_Controls.Base"
     mc:Ignorable="d"
-    DataContext="{Binding RelativeSource={RelativeSource Self}}">
+    DataContext="{Binding RelativeSource={RelativeSource Self}}"
+    KeyDown="SearchPopupUserControl_KeyDown">
 
     <!--<Popup
         Placement="Left"
@@ -20,7 +21,8 @@
         Background="{DynamicResource MahApps.Brushes.ThemeBackground}"
         BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
         BorderThickness="1"
-        Visibility="Collapsed">
+        Visibility="Collapsed"
+        d:Visibility="Visible">
         <Grid
             Width="200">
             <Grid.RowDefinitions>
@@ -49,9 +51,23 @@
                     Margin="10"
                     FontSize="12" />
                 <TextBox
-                    Margin="10,0,10,10"
+                    x:Name="textBoxMain"
+                    Margin="10,0"
                     Text="{Binding searchString, UpdateSourceTrigger=PropertyChanged}"
                     KeyDown="SearchPopup_KeyDown" />
+                <Grid
+                    Margin="10">
+                    <Button
+                        Content="Previous"
+                        HorizontalAlignment="Left"
+                        Width="75"
+                        Click="Previous_Button_Clicked"/>
+                    <Button
+                        Content="Next"
+                        HorizontalAlignment="Right"
+                        Width="75"
+                        Click="Next_Button_Clicked"/>
+                </Grid>
             </StackPanel>
         </Grid>
     </Border>
