@@ -48,8 +48,8 @@ public partial class TextEditorWindow : BaseWindow
         ThemeManager.Current.SyncTheme();
 
         searchPopup.SearchPopupEnterKeyDown += SearchPopup_EnterKeyDown;
-        searchPopup.NextButtonDown          += InDevelopmentMessageBox;
-        searchPopup.PreviousButtonDown      += InDevelopmentMessageBox;
+        searchPopup.NextButtonDown          += NextMatch;
+        searchPopup.PreviousButtonDown      += PreviousMatch;
     }
 
     #endregion

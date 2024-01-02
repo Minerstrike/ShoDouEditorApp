@@ -15,7 +15,7 @@ public partial class SearchPopup : BaseUserControl
 {
     #region Properties
 
-    private bool _isShowingSearchPopup;
+    private bool _isShowingSearchPopup = false;
     /// <summary>
     /// Determines whether the searhc popup is showing
     /// </summary>
@@ -68,11 +68,11 @@ public partial class SearchPopup : BaseUserControl
     //    }
     //}
 
-    private Regex _searchRegex;
+    private Regex? _searchRegex;
     /// <summary>
     /// Responsible for searching for the searchString
     /// </summary>
-    public Regex searchRegex
+    public Regex? searchRegex
     {
         get => _searchRegex;
         set
@@ -82,11 +82,11 @@ public partial class SearchPopup : BaseUserControl
         }
     }
 
-    private MatchCollection _matches;
+    private MatchCollection? _matches;
     /// <summary>
     /// Responsible for the list of matches against the targetText
     /// </summary>
-    public MatchCollection matches
+    public MatchCollection? matches
     {
         get => _matches;
         set
@@ -111,7 +111,7 @@ public partial class SearchPopup : BaseUserControl
     }
 
 
-    private int _start;
+    private int _start = 0;
     /// <summary>
     /// Where in the target text the search string was found
     /// </summary>
@@ -187,7 +187,7 @@ public partial class SearchPopup : BaseUserControl
 
     public delegate void SearchPopupEnterKeyDownEventHandler();
 
-    public event SearchPopupEnterKeyDownEventHandler SearchPopupEnterKeyIsDown;
+    public event SearchPopupEnterKeyDownEventHandler? SearchPopupEnterKeyIsDown;
     protected virtual void OnSearchPopupEnterKeyIsDown()
     {
         if (SearchPopupEnterKeyIsDown is not null)
@@ -196,7 +196,7 @@ public partial class SearchPopup : BaseUserControl
         }
     }
 
-    public event SearchPopupEnterKeyDownEventHandler SearchPopupEnterKeyDown;
+    public event SearchPopupEnterKeyDownEventHandler? SearchPopupEnterKeyDown;
     protected virtual void OnSearchPopupEnterKeyDown()
     {
         if (SearchPopupEnterKeyDown is not null)
@@ -208,7 +208,7 @@ public partial class SearchPopup : BaseUserControl
 
     public delegate void ButtonEventHandler();
 
-    public event ButtonEventHandler NextButtonDown;
+    public event ButtonEventHandler? NextButtonDown;
     protected virtual void OnNextButtonDown()
     {
         if (NextButtonDown is not null)
@@ -217,7 +217,7 @@ public partial class SearchPopup : BaseUserControl
         }
     }
 
-    public event ButtonEventHandler PreviousButtonDown;
+    public event ButtonEventHandler? PreviousButtonDown;
     protected void OnPreviousButtonDown()
     {
         if (PreviousButtonDown is not null)
