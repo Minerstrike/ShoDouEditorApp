@@ -79,10 +79,12 @@
                     Click="MenuItem_Find_Click" />
                 <MenuItem
                     Header="Find next"
-                    Click="MenuItem_FindNext_Click" />
+                    Click="MenuItem_FindNext_Click"
+                    IsEnabled="{Binding isShowingSearchPopup}" />
                 <MenuItem
                     Header="Find previous"
-                    Click="MenuItem_FindPrevious_Click" />
+                    Click="MenuItem_FindPrevious_Click"
+                    IsEnabled="{Binding isShowingSearchPopup}" />
                 <MenuItem
                     Header="Replace"
                     Click="MenuItem_Replace_Click" />
@@ -126,8 +128,8 @@
 
         <StackPanel
             Grid.Row="2">
+            
             <Border
-                x:Name="popupHolder"
                 Padding="0"
                 Margin="0"
                 HorizontalAlignment="Right"
@@ -136,6 +138,17 @@
                 <user_controls:SearchPopup
                     x:Name="searchPopup" />
             </Border>
+
+            <Border
+                Padding="0"
+                Margin="0"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                BorderThickness="0">
+                <user_controls:SearchReplacePopup
+                    x:Name="searchReplacePopup" />
+            </Border>
+
         </StackPanel>
 
         <TextBox

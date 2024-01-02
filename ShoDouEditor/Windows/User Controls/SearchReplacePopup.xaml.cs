@@ -1,5 +1,4 @@
-﻿using ControlzEx.Theming;
-using ShoDouEditor.Windows.User_Controls.Base;
+﻿using ShoDouEditor.Windows.User_Controls.Base;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
@@ -8,26 +7,27 @@ using System.Windows.Media;
 
 namespace ShoDouEditor.Windows.User_Controls;
 
+
 /// <summary>
-/// Interaction logic for SearchPopup.xaml
+/// Interaction logic for SearchReplacePopup.xaml
 /// </summary>
-public partial class SearchPopup : BaseUserControl
+public partial class SearchReplacePopup : BaseUserControl
 {
     #region Properties
 
-    private bool _isShowingSearchPopup = false;
+    private bool _isShowingSearchReplacePopup = false;
     /// <summary>
     /// Determines whether the searhc popup is showing
     /// </summary>
-    public bool isShowingSearchPopup
+    public bool isShowingSearchReplacePopup
     {
-        get => _isShowingSearchPopup;
+        get => _isShowingSearchReplacePopup;
         set
         {
-            _isShowingSearchPopup = value;
+            _isShowingSearchReplacePopup = value;
             NotifyPropertyChanged();
 
-            if (_isShowingSearchPopup)
+            if (_isShowingSearchReplacePopup)
             {
                 searchPopupWrapper.Visibility = Visibility.Visible;
                 textBoxMain.Focus();
@@ -50,6 +50,20 @@ public partial class SearchPopup : BaseUserControl
         set
         {
             _searchString = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    private string _replaceString = string.Empty;
+    /// <summary>
+    /// The property responsible for dealing with the text used to replace
+    /// </summary>
+    public string replaceString
+    {
+        get => _replaceString;
+        set
+        {
+            _replaceString = value;
             NotifyPropertyChanged();
         }
     }
@@ -103,8 +117,8 @@ public partial class SearchPopup : BaseUserControl
     public int currentMatch
     {
         get => _currentMatch;
-        set 
-        { 
+        set
+        {
             _currentMatch = value;
             NotifyPropertyChanged();
         }
@@ -129,14 +143,19 @@ public partial class SearchPopup : BaseUserControl
 
     #region Constructor
 
-    public SearchPopup()
+    public SearchReplacePopup()
     {
         InitializeComponent();
 
         textBoxMain.Foreground = Brushes.Gray;
         textBoxMain.Text = "Find";
         textBoxMain.GotKeyboardFocus += new KeyboardFocusChangedEventHandler(textBox_GotKeyboardFocus);
-        textBoxMain.LostKeyboardFocus += new KeyboardFocusChangedEventHandler(textBox_LostKeyboardFocus);
+        textBoxMain.LostKeyboardFocus += new KeyboardFocusChangedEventHandler(textBoxMain_LostKeyboardFocus);
+
+        textBoxReplace.Foreground = Brushes.Gray;
+        textBoxReplace.Text = "Replace";
+        textBoxReplace.GotKeyboardFocus += new KeyboardFocusChangedEventHandler(textBox_GotKeyboardFocus);
+        textBoxReplace.LostKeyboardFocus += new KeyboardFocusChangedEventHandler(textBoxReplace_LostKeyboardFocus);
     }
 
     #endregion
@@ -145,7 +164,7 @@ public partial class SearchPopup : BaseUserControl
 
     private void SearchPopupCloseButton_Click(object sender, RoutedEventArgs e)
     {
-        isShowingSearchPopup = false;
+        isShowingSearchReplacePopup = false;
     }
 
     private void Previous_Button_Clicked(object sender, RoutedEventArgs e)
@@ -158,6 +177,16 @@ public partial class SearchPopup : BaseUserControl
         OnNextButtonDown();
     }
 
+    private void Replace_Button_Clicked(object sender, RoutedEventArgs e)
+    {
+        
+    }
+
+    private void ReplaceAll_Button_Clicked(object sender, RoutedEventArgs e)
+    {
+        
+    }
+
     #endregion
 
     #region Control Events
@@ -168,7 +197,7 @@ public partial class SearchPopup : BaseUserControl
         {
             OnSearchPopupEnterKeyIsDown();
 
-            
+
 
             OnSearchPopupEnterKeyDown();
         }
@@ -182,9 +211,9 @@ public partial class SearchPopup : BaseUserControl
     {
         if (e.Key == Key.Escape)
         {
-            isShowingSearchPopup = false;
+            isShowingSearchReplacePopup = false;
         }
-    } 
+    }
 
     #endregion
 
@@ -244,7 +273,7 @@ public partial class SearchPopup : BaseUserControl
         }
     }
 
-    private void textBox_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+    private void textBoxMain_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
     {
         //Make sure sender is the correct Control.
         if (sender is TextBox)
@@ -254,6 +283,20 @@ public partial class SearchPopup : BaseUserControl
             {
                 ((TextBox)sender).Foreground = Brushes.Gray;
                 ((TextBox)sender).Text = "Find";
+            }
+        }
+    }
+
+    private void textBoxReplace_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+    {
+        //Make sure sender is the correct Control.
+        if (sender is TextBox)
+        {
+            //If nothing was entered, reset default text.
+            if (((TextBox)sender).Text.Trim().Equals(""))
+            {
+                ((TextBox)sender).Foreground = Brushes.Gray;
+                ((TextBox)sender).Text = "Replace";
             }
         }
     }

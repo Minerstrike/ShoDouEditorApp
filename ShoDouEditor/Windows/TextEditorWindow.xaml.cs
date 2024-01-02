@@ -33,6 +33,22 @@ public partial class TextEditorWindow : BaseWindow
         }
     }
 
+    /// <summary>
+    /// Determines whether the searhc popup is showing
+    /// </summary>
+    public bool isShowingSearchPopup
+    {
+        get => searchPopup is not null ? searchPopup.isShowingSearchPopup : false;
+    }
+
+    /// <summary>
+    /// Determines whether the searhc popup is showing
+    /// </summary>
+    public bool isShowingSearchReplacePopup
+    {
+        get => searchReplacePopup is not null ? searchReplacePopup.isShowingSearchReplacePopup : false;
+    }
+
     #endregion
 
     #region Constructor
@@ -132,22 +148,22 @@ public partial class TextEditorWindow : BaseWindow
 
     private void MenuItem_FindNext_Click(object sender, RoutedEventArgs e)
     {
-        InDevelopmentMessageBox();
+        NextMatch();
     }
 
     private void MenuItem_FindPrevious_Click(object sender, RoutedEventArgs e)
     {
-        InDevelopmentMessageBox();
+        PreviousMatch();
     }
 
     private void MenuItem_Replace_Click(object sender, RoutedEventArgs e)
     {
-        NotImplementedMessageBox();
+        ShowReplaceSearchPopup();
     }
 
     private void MenuItem_GoTo_Click(object sender, RoutedEventArgs e)
     {
-        NotImplementedMessageBox();
+        ShowSearchPopup();
     }
 
     private void MenuItem_SelectAll_Click(object sender, RoutedEventArgs e)
@@ -196,6 +212,27 @@ public partial class TextEditorWindow : BaseWindow
     public void InDevelopmentMessageBox()
     {
         MessageBox.Show("This feature is under development. This is unstable and may cause unforseen problems.", "Under development", MessageBoxButton.OK, MessageBoxImage.Warning);
+    }
+
+    public void searchTextEditor()
+    {
+        if (searchPopup.matches is null)
+        {
+            searchPopup.searchRegex = new Regex("(?i)" + searchPopup.searchString);
+            searchPopup.matches = searchPopup.searchRegex.Matches(textEditorText); 
+        }
+
+        if (searchPopup.matches.Count > 0)
+        {
+            searchPopup.start = searchPopup.matches[searchPopup.currentMatch].Index;
+
+            TbMain.Select(searchPopup.start, searchPopup.searchString.Length);
+            TbMain.Focus();
+        }
+        else
+        {
+            MessageBox.Show("Item not found", "Not found", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
     }
 
     #region File
@@ -247,18 +284,40 @@ public partial class TextEditorWindow : BaseWindow
     public void ShowSearchPopup()
     {
         searchPopup.isShowingSearchPopup = true;
-    } 
+
+        if (searchReplacePopup.isShowingSearchReplacePopup) {
+            searchReplacePopup.isShowingSearchReplacePopup = false;
+        }
+    }
+
+    public void ShowReplaceSearchPopup()
+    {
+        searchReplacePopup.isShowingSearchReplacePopup = true;
+
+        if (searchPopup.isShowingSearchPopup)
+        {
+            searchPopup.isShowingSearchPopup = false;
+        }
+    }
 
     #endregion
 
     private void NextMatch()
     {
+        searchPopup.searchRegex = new Regex("(?i)" + searchPopup.searchString);
+        searchPopup.matches = searchPopup.searchRegex.Matches(textEditorText);
+
         if (searchPopup.matches is not null)
         {
-            if ((searchPopup.matches.Count > 0) && (searchPopup.currentMatch <= searchPopup.matches.Count))
+            if (searchPopup.currentMatch + 1 >= searchPopup.matches.Count)
+            {
+                searchPopup.currentMatch = 0;
+                searchTextEditor();
+            }
+            else if ((searchPopup.matches.Count > 0) && (searchPopup.currentMatch + 1 < searchPopup.matches.Count))
             {
                 searchPopup.currentMatch++;
-                SearchPopup_EnterKeyDown();
+                searchTextEditor();
             }
             else
             {
@@ -267,18 +326,26 @@ public partial class TextEditorWindow : BaseWindow
         }
         else 
         {
-            SearchPopup_EnterKeyDown();
+            searchTextEditor();
         }
     }
 
     private void PreviousMatch()
     {
+        searchPopup.searchRegex = new Regex("(?i)" + searchPopup.searchString);
+        searchPopup.matches = searchPopup.searchRegex.Matches(textEditorText);
+
         if (searchPopup.matches is not null)
         {
-            if ((searchPopup.matches.Count > 0) && (searchPopup.currentMatch > 0))
+            if (searchPopup.currentMatch <= 0)
+            {
+                searchPopup.currentMatch = searchPopup.matches.Count - 1;
+                searchTextEditor();
+            }
+            else if ((searchPopup.matches.Count > 0) && (searchPopup.currentMatch > 0))
             {
                 searchPopup.currentMatch--;
-                SearchPopup_EnterKeyDown();
+                searchTextEditor();
             }
             else
             {
@@ -287,7 +354,7 @@ public partial class TextEditorWindow : BaseWindow
         }
         else
         {
-            SearchPopup_EnterKeyDown();
+            searchTextEditor();
         }
     }
 
@@ -350,20 +417,7 @@ public partial class TextEditorWindow : BaseWindow
 
     private void SearchPopup_EnterKeyDown()
     {
-        searchPopup.searchRegex = new Regex("(?i)" + searchPopup.searchString);
-        searchPopup.matches = searchPopup.searchRegex.Matches(textEditorText);
-
-        if (searchPopup.matches.Count > 0)
-        {
-            searchPopup.start = searchPopup.matches[searchPopup.currentMatch].Index;
-
-            TbMain.Select(searchPopup.start,searchPopup.searchString.Length);
-            TbMain.Focus();
-        }
-        else
-        {
-            MessageBox.Show("Item not found", "Not found", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
+        searchTextEditor();
     }
 
     #endregion
